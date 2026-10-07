@@ -67,13 +67,18 @@ graph TD
 - 📄 **Programmatic PDF Report Generation**: Generates multi-page PDF screening reports with side-by-side lesion vs. heatmap visual comparisons and **ABCDE rule** breakdowns.
 ---
 
-## 🖼️ Dashboard & Visual Explainability (XAI) Preview
+---
 
-### 🖥️ Clinical Dashboard & Assessment Interface
-![DermAI Clinical Dashboard Preview](docs/screenshots/dashboard-preview.svg)
+## 🖼️ Application Interface & AI Assessment Previews
 
-### 👁️ Grad-CAM Neural Attention Heatmap Overlay (`conv5_block3_out`)
-![DermAI Grad-CAM Visual Heatmap](docs/screenshots/gradcam-preview.svg)
+### 🌐 DermAI Platform Landing Page
+![DermAI Landing Page](docs/screenshots/landing-page.png)
+
+### 🖥️ Clinical Dashboard & Lesion Upload Interface
+![DermAI Live Clinical Dashboard](docs/screenshots/dashboard-page.png)
+
+### 🔬 AI Assessment Results & Grad-CAM Heatmap Overlay (`conv5_block3_out`)
+![DermAI Assessment Results & Grad-CAM Heatmap](docs/screenshots/assessment-results.png)
 
 ---
 
