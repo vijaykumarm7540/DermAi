@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="100%" height="100%" style="background-color: #0f172a; font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;">
+  <defs>
+    <linearGradient id="db-hdr" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <linearGradient id="badge-green" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#16a34a" />
+      <stop offset="100%" stop-color="#15803d" />
+    </linearGradient>
+    <linearGradient id="badge-red" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dc2626" />
+      <stop offset="100%" stop-color="#b91c1c" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Browser Container Window -->
+  <rect x="40" y="30" width="1120" height="640" rx="16" fill="#f8fafc" stroke="#334155" stroke-width="2" filter="url(#shadow)"/>
+  
+  <!-- Browser Header Bar -->
+  <rect x="40" y="30" width="1120" height="42" rx="16" fill="#1e293b"/>
+  <circle cx="68" cy="51" r="6" fill="#ef4444"/>
+  <circle cx="88" cy="51" r="6" fill="#f59e0b"/>
+  <circle cx="108" cy="51" r="6" fill="#10b981"/>
+  <rect x="360" y="40" width="480" height="22" rx="6" fill="#0f172a"/>
+  <text x="600" y="55" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">http://127.0.0.1:5001/dashboard — DermAI Clinical Screening Platform</text>
+
+  <!-- App Header / Navbar -->
+  <rect x="40" y="72" width="1120" height="54" fill="url(#db-hdr)"/>
+  <text x="70" y="105" fill="#ffffff" font-size="18" font-weight="800" letter-spacing="0.5">DermAI <tspan font-size="12" font-weight="400" fill="#bae6fd">| Clinical AI Screening &amp; Decision Support</tspan></text>
+  <rect x="1000" y="86" width="130" height="28" rx="14" fill="rgba(255,255,255,0.2)"/>
+  <text x="1065" y="104" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="700">Dr. Sarah Jenkins</text>
+
+  <!-- Left Panel: Lesion Photo Upload & Input -->
+  <g transform="translate(70, 150)">
+    <rect width="480" height="490" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="24" y="36" fill="#0f172a" font-size="15" font-weight="700">New Skin Lesion Screening Scan</text>
+    <text x="24" y="54" fill="#64748b" font-size="11">Select or drop a clear dermoscopic skin photo (JPG, PNG, WEBP)</text>
+
+    <!-- Upload Dropzone Box -->
+    <rect x="24" y="76" width="432" height="180" rx="12" fill="#f0f9ff" stroke="#0284c7" stroke-width="2" stroke-dasharray="6,6"/>
+    <circle cx="240" cy="140" r="28" fill="#e0f2fe"/>
+    <path d="M 240 125 L 240 155 M 225 140 L 255 140" stroke="#0284c7" stroke-width="3" stroke-linecap="round"/>
+    <text x="240" y="186" text-anchor="middle" fill="#0369a1" font-size="13" font-weight="700">Lesion Photo Uploaded Successfully</text>
+    <text x="240" y="204" text-anchor="middle" fill="#64748b" font-size="11">scan_2_1787647258_test_lesion.jpg (224x224 RGB)</text>
+
+    <!-- Metadata Fields -->
+    <rect x="24" y="276" width="206" height="42" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="36" y="293" fill="#64748b" font-size="10">Patient Name</text>
+    <text x="36" y="309" fill="#0f172a" font-size="12" font-weight="700">John Doe</text>
+
+    <rect x="250" y="276" width="206" height="42" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="262" y="293" fill="#64748b" font-size="10">Attending Doctor</text>
+    <text x="262" y="309" fill="#0284c7" font-size="12" font-weight="700">Dr. Sarah Jenkins</text>
+
+    <!-- Submit Action Button -->
+    <rect x="24" y="338" width="432" height="46" rx="23" fill="url(#db-hdr)"/>
+    <text x="240" y="366" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="800" letter-spacing="0.5">RUN NEURAL RESNET50 ANALYSIS</text>
+    
+    <!-- Model Architecture Indicator -->
+    <rect x="24" y="404" width="432" height="60" rx="8" fill="#f1f5f9"/>
+    <text x="36" y="426" fill="#334155" font-size="11" font-weight="700">Model Pipeline: ResNet50 + Temperature Scaling (T=0.5000)</text>
+    <text x="36" y="444" fill="#64748b" font-size="10">Zero-Mean BGR Normalization | Grad-CAM Layer: conv5_block3_out</text>
+  </g>
+
+  <!-- Right Panel: AI Results & Clinical Guidance -->
+  <g transform="translate(580, 150)">
+    <rect width="520" height="490" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+    
+    <!-- Classification Header Banner -->
+    <rect x="24" y="24" width="472" height="110" rx="12" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+    <rect x="36" y="36" width="130" height="24" rx="12" fill="url(#badge-red)"/>
+    <text x="101" y="52" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="800" letter-spacing="0.5">SEVERE RISK</text>
+    
+    <text x="36" y="86" fill="#dc2626" font-size="24" font-weight="900">Melanoma Detected</text>
+    <text x="360" y="56" text-anchor="end" fill="#0f172a" font-size="12" font-weight="700">Calibrated Confidence</text>
+    <text x="360" y="88" text-anchor="end" fill="#dc2626" font-size="28" font-weight="900">100.0%</text>
+
+    <!-- Side-by-Side Visual Heatmap Box -->
+    <g transform="translate(24, 150)">
+      <rect width="472" height="170" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+      <text x="16" y="24" fill="#0f172a" font-size="12" font-weight="700">Grad-CAM Neural Attention Heatmap vs Original Lesion</text>
+      
+      <!-- Simulated Lesion Original -->
+      <rect x="16" y="36" width="210" height="118" rx="8" fill="#d1d5db"/>
+      <circle cx="121" cy="95" r="38" fill="#4b5563"/>
+      <path d="M 100 80 Q 125 60 145 85 Q 155 115 125 120 Q 95 110 100 80 Z" fill="#1f2937"/>
+      <text x="121" y="145" text-anchor="middle" fill="#ffffff" font-size="9" font-weight="700">Original Lesion Photo</text>
+
+      <!-- Simulated Grad-CAM Heatmap -->
+      <rect x="246" y="36" width="210" height="118" rx="8" fill="#1e1b4b"/>
+      <circle cx="351" cy="95" r="42" fill="#312e81"/>
+      <circle cx="351" cy="95" r="28" fill="#d97706" opacity="0.85"/>
+      <circle cx="351" cy="95" r="16" fill="#ef4444" opacity="0.9"/>
+      <text x="351" y="145" text-anchor="middle" fill="#ffffff" font-size="9" font-weight="700">Grad-CAM Overlay (conv5_block3_out)</text>
+    </g>
+
+    <!-- AI Clinical Guidance Box -->
+    <g transform="translate(24, 335)">
+      <rect width="472" height="130" rx="10" fill="#f0f9ff" stroke="#bae6fd"/>
+      <text x="16" y="24" fill="#0369a1" font-size="12" font-weight="700">RAG + NVIDIA NIM (Llama-3.1-70B) Clinical Insights</text>
+      <text x="16" y="44" fill="#334155" font-size="11" font-weight="600">• High-risk asymmetric cellular variation flagged at central lesion margins.</text>
+      <text x="16" y="62" fill="#334155" font-size="11" font-weight="600">• Immediate dermatological evaluation &amp; biopsy recommended.</text>
+      
+      <!-- Download PDF Action Pill -->
+      <rect x="16" y="78" width="180" height="32" rx="16" fill="#0284c7"/>
+      <text x="106" y="98" text-anchor="middle" fill="#ffffff" font-size="11" font-weight="700">Download PDF Report</text>
+
+      <rect x="210" y="78" width="246" height="32" rx="16" fill="#ffffff" stroke="#0284c7"/>
+      <text x="333" y="98" text-anchor="middle" fill="#0284c7" font-size="11" font-weight="700">View Full Doctor Clinical Records</text>
+    </g>
+  </g>
+</svg>

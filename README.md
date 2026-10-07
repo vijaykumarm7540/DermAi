@@ -65,7 +65,15 @@ graph TD
 - 🩺 **Piecewise Mathematical Severity Risk Stratification**: Assigns `LOW`, `MODERATE`, or `SEVERE` risk tiers dynamically based on calibrated probabilities $p_{\text{calibrated}} = \sigma(z / 0.5000)$.
 - 🧠 **Local RAG + NVIDIA NIM Integration**: Combines local domain knowledge (`backend/knowledge/skin_diseases.md`) with `meta/llama-3.1-70b-instruct` on NVIDIA NIM (`https://integrate.api.nvidia.com/v1`) to produce clinical insights.
 - 📄 **Programmatic PDF Report Generation**: Generates multi-page PDF screening reports with side-by-side lesion vs. heatmap visual comparisons and **ABCDE rule** breakdowns.
-- 👨‍⚕️ **Filtered Doctor & Patient History Views**: Dual-view routing (`/doctor/<name>` and `/patient/<name>`) for technical clinical analytics vs. simplified patient history.
+---
+
+## 🖼️ Dashboard & Visual Explainability (XAI) Preview
+
+### 🖥️ Clinical Dashboard & Assessment Interface
+![DermAI Clinical Dashboard Preview](docs/screenshots/dashboard-preview.svg)
+
+### 👁️ Grad-CAM Neural Attention Heatmap Overlay (`conv5_block3_out`)
+![DermAI Grad-CAM Visual Heatmap](docs/screenshots/gradcam-preview.svg)
 
 ---
 

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="100%" height="100%" style="background-color: #0f172a; font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;">
+  <defs>
+    <linearGradient id="g-hdr" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0d9488" />
+    </linearGradient>
+    <filter id="shd" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Title Header -->
+  <text x="500" y="42" text-anchor="middle" fill="#f8fafc" font-size="22" font-weight="800">DermAI Grad-CAM Visual Explainability (XAI)</text>
+  <text x="500" y="66" text-anchor="middle" fill="#94a3b8" font-size="12">Target Layer: conv5_block3_out | Class: Melanoma | Calibrated Confidence: 100.0%</text>
+
+  <!-- Panel 1: Original Image -->
+  <g transform="translate(60, 100)" filter="url(#shd)">
+    <rect width="410" height="340" rx="14" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <rect width="410" height="36" rx="14" fill="#334155"/>
+    <text x="205" y="24" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="700">1. Original Input Lesion Image</text>
+
+    <!-- Simulated Lesion Photo -->
+    <rect x="25" y="55" width="360" height="230" rx="10" fill="#e2e8f0"/>
+    <ellipse cx="205" cy="170" rx="90" ry="70" fill="#475569"/>
+    <path d="M 140 140 Q 190 100 240 130 Q 280 180 230 210 Q 150 220 140 140 Z" fill="#1e293b"/>
+    <circle cx="210" cy="165" r="30" fill="#0f172a"/>
+
+    <text x="205" y="312" text-anchor="middle" fill="#94a3b8" font-size="11">Dermoscopic Input (224 x 224 RGB, Normalized)</text>
+  </g>
+
+  <!-- Panel 2: Grad-CAM Superimposed Heatmap -->
+  <g transform="translate(530, 100)" filter="url(#shd)">
+    <rect width="410" height="340" rx="14" fill="#1e293b" stroke="#0284c7" stroke-width="2"/>
+    <rect width="410" height="36" rx="14" fill="url(#g-hdr)"/>
+    <text x="205" y="24" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">2. Grad-CAM Attention Heatmap Overlay</text>
+
+    <!-- Simulated Heatmap Output -->
+    <rect x="25" y="55" width="360" height="230" rx="10" fill="#030712"/>
+    
+    <!-- Outer Low Activation (Blue/Cyan) -->
+    <ellipse cx="205" cy="170" rx="110" ry="85" fill="#1e40af" opacity="0.6"/>
+    <ellipse cx="205" cy="170" rx="90" ry="70" fill="#0284c7" opacity="0.75"/>
+    
+    <!-- Medium Activation (Green/Yellow) -->
+    <ellipse cx="205" cy="170" rx="65" ry="50" fill="#16a34a" opacity="0.85"/>
+    <ellipse cx="205" cy="170" rx="45" ry="35" fill="#eab308" opacity="0.9"/>
+    
+    <!-- High Activation Core (Red/Orange) -->
+    <ellipse cx="205" cy="170" rx="30" ry="22" fill="#dc2626" opacity="0.95"/>
+    <circle cx="205" cy="165" r="14" fill="#f87171"/>
+
+    <text x="205" y="312" text-anchor="middle" fill="#38bdf8" font-size="11">Superimposed COLORMAP_JET (Layer: conv5_block3_out)</text>
+  </g>
+</svg>
