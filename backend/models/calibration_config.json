@@ -1,0 +1,9 @@
+{
+    "temperature": 0.5,
+    "uncertainty_threshold": 0.65,
+    "ece_before": 0.1533,
+    "ece_after": 0.0488,
+    "avg_melanoma_conf_before": 84.21,
+    "avg_melanoma_conf_after": 94.28,
+    "calibrated_at": "2026-08-27T19:43:00Z"
+}

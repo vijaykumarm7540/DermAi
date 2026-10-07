@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - DermAI Medical AI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-saas p-4 p-md-5 border-0 shadow-lg bg-white">
+            <div class="text-center mb-4">
+                <div class="brand-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.4rem;">
+                    <i class="bi bi-person-lock"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-1">Sign In to DermAI</h3>
+                <p class="text-muted small">Access your patient screening dashboard and scan history</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('login') }}">
+                {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label text-dark small fw-semibold">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control bg-light border-start-0 text-dark" id="email" name="email" required placeholder="doctor@example.com">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label text-dark small fw-semibold">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control bg-light border-start-0 text-dark" id="password" name="password" required placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-saas-primary w-100 py-2.5 mb-3 fw-semibold">
+                    Sign In <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+            </form>
+
+            <div class="text-center mt-3 pt-3 border-top">
+                <p class="text-muted small mb-0">New to DermAI? <a href="{{ url_for('signup') }}" class="text-primary text-decoration-none fw-bold">Create an account</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

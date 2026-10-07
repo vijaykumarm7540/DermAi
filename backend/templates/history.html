@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Screening History - DermAI Medical Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="fw-bold text-dark mb-1"><i class="bi bi-clock-history text-primary me-2"></i>Screening History</h3>
+            <p class="text-muted mb-0">Review past skin lesion assessments, severity flags, and download PDF clinical reports.</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-saas-primary btn-sm rounded-pill">
+            <i class="bi bi-plus-lg me-1"></i> New Scan
+        </a>
+    </div>
+
+    <div class="col-12">
+        <div class="card card-saas p-4 border-0 shadow-sm bg-white">
+            {% if predictions %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="text-muted small">
+                                <th scope="col" class="fw-semibold">Date & Time</th>
+                                <th scope="col" class="fw-semibold">Patient Name</th>
+                                <th scope="col" class="fw-semibold">Attending Doctor</th>
+                                <th scope="col" class="fw-semibold">Classification</th>
+                                <th scope="col" class="fw-semibold">Confidence</th>
+                                <th scope="col" class="fw-semibold">Severity Risk</th>
+                                <th scope="col" class="text-end fw-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in predictions %}
+                                <tr>
+                                    <td>
+                                        <span class="text-dark fw-medium">{{ p['created_at'][:16] if p['created_at'] else 'N/A' }}</span>
+                                    </td>
+                                    <td>
+                                        {% set p_name = p['patient_name'] if p['patient_name'] else 'Patient' %}
+                                        <a href="{{ url_for('patient_history', patient_name=p_name) }}" class="text-dark fw-semibold text-decoration-none hover-primary">
+                                            {{ p_name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% set d_name = p['doctor_name'] if p['doctor_name'] else 'Unassigned' %}
+                                        <a href="{{ url_for('doctor_history', doctor_name=d_name) }}" class="text-primary fw-semibold text-decoration-none">
+                                            Dr. {{ d_name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold fs-6 {{ 'text-danger' if p['prediction'] == 'Melanoma' else 'text-success' }}">
+                                            {{ 'Melanoma Detected' if p['prediction'] == 'Melanoma' else 'Benign' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border px-2.5 py-1 fs-6 font-monospace">
+                                            {{ p['confidence'] }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ 'bg-danger text-white' if p['severity'] == 'SEVERE' else ('bg-warning text-dark' if p['severity'] == 'MODERATE' else 'bg-success text-white') }} px-2.5 py-1">
+                                            {{ p['severity'] }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-1">
+                                            <a href="{{ url_for('download_report', scan_id=p['id']) }}" class="btn btn-sm btn-outline-primary rounded-pill px-2.5" title="Download PDF Report">
+                                                <i class="bi bi-file-earmark-pdf"></i> Report
+                                            </a>
+                                            <a href="{{ url_for('view_result', result_id=p['id']) }}" class="btn btn-sm btn-saas-outline rounded-pill px-2.5">
+                                                View <i class="bi bi-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-folder2-open display-3 d-block mb-3 text-secondary opacity-50"></i>
+                    <h5 class="fw-bold text-dark">No screening history recorded</h5>
+                    <p class="mb-3">You haven't submitted any skin lesion photos for analysis yet.</p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-saas-primary rounded-pill">Start First Scan</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

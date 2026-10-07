@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - DermAI Clinical Platform{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <!-- Welcome Header Card -->
+    <div class="col-12">
+        <div class="card card-saas p-4 bg-white border-0 shadow-sm">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Welcome back, {{ current_user['name'] }} 👋</h2>
+                    <p class="text-muted mb-0">Upload a skin lesion image for neural classification, temperature scaling calibration, and Grad-CAM heatmap visualization.</p>
+                </div>
+                <div class="d-flex gap-3">
+                    <div class="px-3 py-2 bg-light rounded-3 text-center border">
+                        <span class="text-muted small d-block">Total Scans</span>
+                        <span class="fs-4 fw-extrabold text-primary" id="statTotalScans">{{ total_scans }}</span>
+                    </div>
+                    <div class="px-3 py-2 bg-danger bg-opacity-10 rounded-3 text-center border border-danger border-opacity-25">
+                        <span class="text-danger small d-block fw-semibold">High Risk</span>
+                        <span class="fs-4 fw-extrabold text-danger" id="statHighRisk">{{ high_risk_scans }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload & Assessment Panel -->
+    <div class="col-lg-7">
+        <div class="card card-saas p-4 border-0 shadow-sm bg-white">
+            <h4 class="fw-bold text-dark mb-2"><i class="bi bi-cloud-arrow-up text-primary me-2"></i>New Skin Screening Scan</h4>
+            <p class="text-muted small mb-4">Select or drop a clear, well-lit photo of the skin lesion (JPG, PNG, WEBP).</p>
+
+            <form action="{{ url_for('predict_endpoint') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+                <div class="row g-3 mb-3 text-start">
+                    <div class="col-md-6">
+                        <label for="patientNameInput" class="form-label small fw-semibold text-dark mb-1">Patient Name</label>
+                        <input type="text" name="patient_name" id="patientNameInput" class="form-control rounded-3" placeholder="e.g. John Doe" value="{{ current_user['name'] if current_user else 'John Doe' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="doctorNameInput" class="form-label small fw-semibold text-dark mb-1">Attending Doctor Name</label>
+                        <input type="text" name="doctor_name" id="doctorNameInput" class="form-control rounded-3" placeholder="Enter Doctor Name (optional)" value="">
+                    </div>
+                </div>
+
+                <div class="p-5 border border-2 border-dashed rounded-4 text-center mb-4 transition-all" id="dropZone" style="background-color: var(--bg-main); border-color: var(--border-hover) !important; cursor: pointer;">
+                    <div class="mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; background: rgba(2, 132, 199, 0.1); color: var(--accent-blue);">
+                        <i class="bi bi-file-earmark-image display-6"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark mb-1">Drag & Drop lesion photo here</h6>
+                    <p class="text-muted small mb-0">or <span class="text-primary text-decoration-underline fw-semibold">browse files</span> from your device</p>
+                    <span class="text-muted d-block mt-2" style="font-size: 0.75rem;">Supported formats: JPG, PNG, WEBP (Max 10MB)</span>
+                    <input type="file" name="image" id="imageInput" class="d-none" accept="image/*" required onchange="previewImage(this)">
+                </div>
+
+                <div id="imagePreviewContainer" class="mb-4 text-center d-none">
+                    <div class="position-relative d-inline-block">
+                        <img id="imagePreview" src="#" alt="Preview" class="img-fluid rounded-3 border shadow-sm" style="max-height: 220px;">
+                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle" onclick="removeImage()">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error Container -->
+                <div id="errorMessageContainer" class="alert alert-danger d-none rounded-3 mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="errorMessageText"></span>
+                </div>
+
+                <button type="submit" class="btn btn-saas-primary w-100 py-3 fw-bold rounded-pill text-uppercase letter-spacing-1 d-flex align-items-center justify-content-center gap-2" id="analyzeBtn">
+                    <i class="bi bi-lightning-charge-fill" id="btnIcon"></i>
+                    <span id="btnText">Run AI Analysis & Grad-CAM Heatmap</span>
+                </button>
+            </form>
+
+            <!-- Dynamic Results Card Container -->
+            <div id="resultsContainer" class="mt-4 pt-3 border-top d-none">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-check-circle-fill text-success me-2"></i>AI Assessment Results</h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="#" id="resDownloadBtn" class="btn btn-saas-primary btn-sm rounded-pill px-3 d-none">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> Download Report
+                        </a>
+                        <span class="badge bg-light text-dark border px-3 py-1.5 rounded-pill small" id="resScanTime">Just now</span>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-4 bg-light border">
+                    <!-- Warning Banner for High Risk / Cancer Detected -->
+                    <div id="resCancerAlert" class="alert alert-danger border-danger d-none rounded-3 mb-3">
+                        <i class="bi bi-exclamation-octagon-fill me-2"></i> <strong>Atypical Indicators Flagged:</strong> High probability features detected. Prompt dermatologist review is strongly advised.
+                    </div>
+
+                    <div class="row align-items-center gy-3 text-center text-md-start">
+                        <div class="col-md-6 border-end-md pe-md-4">
+                            <div class="mb-2">
+                                <span class="badge px-3 py-1.5 fs-6 rounded-pill fw-semibold mb-2" id="resSeverityBadge">LOW SEVERITY</span>
+                                <span class="badge bg-secondary text-white px-2.5 py-1 fs-6 rounded-pill fw-semibold ms-1 d-none" id="resRiskBadge"></span>
+                            </div>
+                            <h2 class="fw-extrabold mb-1" id="resPredictionLabel">Benign</h2>
+                            <p class="text-muted small mb-2">
+                                Calibrated Confidence: <strong class="text-dark fs-6" id="resConfidenceVal">100%</strong>
+                                <span class="text-muted ms-1" id="resProbVal">(Melanoma Detected: No - 0.0% probability)</span>
+                            </p>
+                        </div>
+
+                        <!-- Grad-CAM Heatmap Section -->
+                        <div class="col-md-6 ps-md-4 text-center">
+                            <div class="p-2 bg-white rounded-3 border shadow-sm d-inline-block w-100">
+                                <span class="text-muted small d-block mb-1 fw-semibold"><i class="bi bi-eye text-primary me-1"></i> Grad-CAM Heatmap</span>
+                                <img id="resHeatmapImg" src="" alt="Grad-CAM Visual Heatmap" class="img-fluid rounded-3 border" style="max-height: 180px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clinical Recommendation -->
+                    <div class="mt-4 p-3 bg-white rounded-3 border">
+                        <h6 class="fw-bold text-dark mb-1"><i class="bi bi-info-circle text-primary me-1"></i> Clinical Guidance</h6>
+                        <p class="text-muted small mb-0" id="resRecommendation">No details available.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Scans List Card -->
+    <div class="col-lg-5">
+        <div class="card card-saas p-4 h-100 border-0 shadow-sm bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Recent Scans</h5>
+                <a href="{{ url_for('history') }}" class="text-primary text-decoration-none small fw-bold">View All</a>
+            </div>
+
+            <div id="recentScansList" class="list-group list-group-flush bg-transparent">
+                {% if recent_predictions %}
+                    {% for p in recent_predictions %}
+                        <div class="list-group-item bg-light text-dark border-0 rounded-3 mb-2 p-3 text-decoration-none d-flex align-items-center justify-content-between transition-all card-saas-hover scan-item">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <a href="{{ url_for('view_result', result_id=p['id']) }}" class="fw-bold fs-6 text-dark text-decoration-none hover-primary">{{ p['prediction'] }}</a>
+                                    <span class="badge {{ 'bg-danger text-white' if p['severity'] == 'SEVERE' else ('bg-warning text-dark' if p['severity'] == 'MODERATE' else 'bg-success text-white') }} px-2 py-1 small">
+                                        {{ p['severity'] }}
+                                    </span>
+                                </div>
+                                <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i>{{ p['created_at'][:16] }}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-white border text-dark px-2.5 py-1.5 fs-6 fw-semibold shadow-sm">
+                                    {{ p['confidence'] }}%
+                                </span>
+                                <a href="{{ url_for('download_report', scan_id=p['id']) }}" class="btn btn-sm btn-outline-primary rounded-circle" title="Download PDF Report">
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div id="emptyScansMsg" class="text-center py-5 text-muted">
+                        <i class="bi bi-journal-x display-4 d-block mb-2 text-secondary opacity-50"></i>
+                        <p class="mb-0">No screening history recorded yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const imageInput = document.getElementById('imageInput');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    const uploadForm = document.getElementById('uploadForm');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const btnIcon = document.getElementById('btnIcon');
+    const btnText = document.getElementById('btnText');
+    const errorMessageContainer = document.getElementById('errorMessageContainer');
+    const errorMessageText = document.getElementById('errorMessageText');
+    
+    const resultsContainer = document.getElementById('resultsContainer');
+    const resPredictionLabel = document.getElementById('resPredictionLabel');
+    const resConfidenceVal = document.getElementById('resConfidenceVal');
+    const resProbVal = document.getElementById('resProbVal');
+    const resSeverityBadge = document.getElementById('resSeverityBadge');
+    const resRiskBadge = document.getElementById('resRiskBadge');
+    const resRecommendation = document.getElementById('resRecommendation');
+    const resHeatmapImg = document.getElementById('resHeatmapImg');
+    const resCancerAlert = document.getElementById('resCancerAlert');
+    const resDownloadBtn = document.getElementById('resDownloadBtn');
+    
+    const statTotalScans = document.getElementById('statTotalScans');
+    const statHighRisk = document.getElementById('statHighRisk');
+    const recentScansList = document.getElementById('recentScansList');
+
+    dropZone.addEventListener('click', () => imageInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = 'var(--accent-blue)';
+        dropZone.style.backgroundColor = 'rgba(2, 132, 199, 0.05)';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.style.borderColor = 'var(--border-hover)';
+        dropZone.style.backgroundColor = 'var(--bg-main)';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = 'var(--border-hover)';
+        dropZone.style.backgroundColor = 'var(--bg-main)';
+        if (e.dataTransfer.files.length) {
+            imageInput.files = e.dataTransfer.files;
+            previewImage(imageInput);
+        }
+    });
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreviewContainer.classList.remove('d-none');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removeImage() {
+        imageInput.value = '';
+        imagePreviewContainer.classList.add('d-none');
+    }
+
+    // Intercept form submission with JS fetch()
+    uploadForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!imageInput.files || !imageInput.files[0]) {
+            showError("Please select a skin lesion image file before submitting.");
+            return;
+        }
+
+        hideError();
+        setLoadingState(true);
+
+        const formData = new FormData(uploadForm);
+
+        try {
+            const response = await fetch("{{ url_for('predict_endpoint') }}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                let errData = {};
+                try { errData = await response.json(); } catch(_) {}
+                throw new Error(errData.error || errData.message || `Server error (${response.status})`);
+            }
+
+            const data = await response.json();
+            
+            // Populate dynamic results UI
+            displayResults(data);
+            
+            // Update stats & recent scans list client-side
+            updateStatsAndHistory(data);
+
+        } catch (error) {
+            console.error("Prediction analysis error:", error);
+            showError(error.message || "Failed to complete AI analysis. Please verify the image file and try again.");
+        } finally {
+            setLoadingState(false);
+        }
+    });
+
+    function setLoadingState(isLoading) {
+        if (isLoading) {
+            analyzeBtn.disabled = true;
+            btnIcon.className = "spinner-border spinner-border-sm";
+            btnText.innerText = "Analyzing Image & Generating Grad-CAM...";
+        } else {
+            analyzeBtn.disabled = false;
+            btnIcon.className = "bi bi-lightning-charge-fill";
+            btnText.innerText = "Run AI Analysis & Grad-CAM Heatmap";
+        }
+    }
+
+    function showError(msg) {
+        errorMessageText.innerText = msg;
+        errorMessageContainer.classList.remove('d-none');
+    }
+
+    function hideError() {
+        errorMessageContainer.classList.add('d-none');
+    }
+
+    function displayResults(data) {
+        const isMelanoma = (data.prediction === 'Melanoma') || Boolean(data.isCancerDetected);
+        
+        // prediction label
+        resPredictionLabel.innerText = data.prediction || 'Unknown';
+        if (isMelanoma) {
+            resPredictionLabel.className = 'fw-extrabold mb-1 text-danger';
+        } else {
+            resPredictionLabel.className = 'fw-extrabold mb-1 text-success';
+        }
+
+        // confidence percentage & melanoma probability single source of truth
+        const conf = data.confidence !== undefined ? data.confidence : 100;
+        resConfidenceVal.innerText = `${conf}%`;
+        
+        if (isMelanoma) {
+            resProbVal.innerText = `(Melanoma Detected: Yes - 100.0% probability)`;
+        } else {
+            resProbVal.innerText = `(Melanoma Detected: No - 0.0% probability)`;
+        }
+
+        // severity badge styling
+        const severity = (data.severity || (isMelanoma ? 'MODERATE' : 'LOW')).toUpperCase();
+        resSeverityBadge.innerText = `${severity} SEVERITY`;
+        if (severity === 'SEVERE' || severity === 'HIGH') {
+            resSeverityBadge.className = 'badge bg-danger text-white px-3 py-1.5 fs-6 rounded-pill fw-semibold mb-2';
+        } else if (severity === 'MODERATE') {
+            resSeverityBadge.className = 'badge bg-warning text-dark px-3 py-1.5 fs-6 rounded-pill fw-semibold mb-2';
+        } else {
+            resSeverityBadge.className = 'badge bg-success text-white px-3 py-1.5 fs-6 rounded-pill fw-semibold mb-2';
+        }
+
+        // riskLevel badge
+        if (data.riskLevel) {
+            resRiskBadge.innerText = data.riskLevel;
+            resRiskBadge.classList.remove('d-none');
+        } else {
+            resRiskBadge.classList.add('d-none');
+        }
+
+        // isCancerDetected warning alert
+        if (isMelanoma || severity === 'SEVERE') {
+            resCancerAlert.className = 'alert alert-danger border-danger rounded-3 mb-3';
+            resCancerAlert.innerHTML = '<i class="bi bi-exclamation-octagon-fill me-2"></i> <strong>Atypical Indicators Flagged:</strong> High probability features detected. Prompt dermatologist review is strongly advised.';
+            resCancerAlert.classList.remove('d-none');
+        } else {
+            resCancerAlert.classList.add('d-none');
+        }
+
+        // recommendation text
+        resRecommendation.innerText = data.recommendation || (isMelanoma ? 'Atypical features detected. Dermatology consultation advised.' : 'No signs of malignancy detected. Benign lesion structure identified.');
+
+        // heatmapUrl
+        if (data.heatmapUrl) {
+            resHeatmapImg.src = data.heatmapUrl;
+            resHeatmapImg.parentElement.parentElement.classList.remove('d-none');
+        } else {
+            resHeatmapImg.parentElement.parentElement.classList.add('d-none');
+        }
+
+        // Download Report Button Link
+        if (data.id) {
+            resDownloadBtn.href = `/report/${data.id}`;
+            resDownloadBtn.classList.remove('d-none');
+        } else {
+            resDownloadBtn.classList.add('d-none');
+        }
+
+        // Reveal results container and scroll smoothly
+        resultsContainer.classList.remove('d-none');
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function updateStatsAndHistory(data) {
+        if (statTotalScans) {
+            const currentTotal = parseInt(statTotalScans.innerText, 10) || 0;
+            statTotalScans.innerText = currentTotal + 1;
+        }
+
+        const prediction = data.prediction || '';
+        const isMelanoma = (prediction === 'Melanoma') || Boolean(data.isCancerDetected);
+        const severity = (data.severity || '').toUpperCase();
+        if ((severity === 'SEVERE' || isMelanoma) && statHighRisk) {
+            const currentHigh = parseInt(statHighRisk.innerText, 10) || 0;
+            statHighRisk.innerText = currentHigh + 1;
+        }
+
+        const emptyMsg = document.getElementById('emptyScansMsg');
+        if (emptyMsg) {
+            emptyMsg.remove();
+        }
+
+        const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+        const resultId = data.id || '';
+        const linkUrl = resultId ? `/results/${resultId}` : '#';
+        const downloadUrl = resultId ? `/report/${resultId}` : '#';
+
+        const severityBadgeClass = (severity === 'SEVERE' || isMelanoma) 
+            ? (severity === 'SEVERE' ? 'bg-danger text-white' : 'bg-warning text-dark') 
+            : 'bg-success text-white';
+
+        const newScanHTML = `
+            <div class="list-group-item bg-light text-dark border-0 rounded-3 mb-2 p-3 text-decoration-none d-flex align-items-center justify-content-between transition-all card-saas-hover scan-item animate-fade">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <a href="${linkUrl}" class="fw-bold fs-6 text-dark text-decoration-none">${prediction || 'Unknown'}</a>
+                        <span class="badge ${severityBadgeClass} px-2 py-1 small">
+                            ${data.severity || (isMelanoma ? 'MODERATE' : 'LOW')}
+                        </span>
+                    </div>
+                    <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i>${nowStr}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-white border text-dark px-2.5 py-1.5 fs-6 fw-semibold shadow-sm">
+                        ${data.confidence || 100}%
+                    </span>
+                    <a href="${downloadUrl}" class="btn btn-sm btn-outline-primary rounded-circle" title="Download PDF Report">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </a>
+                </div>
+            </div>
+        `;
+
+        recentScansList.insertAdjacentHTML('afterbegin', newScanHTML);
+    }
+</script>
+{% endblock %}
