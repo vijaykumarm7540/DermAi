@@ -19,28 +19,28 @@ The platform integrates deep **ResNet50 Transfer Learning**, **Post-Processing T
 
 ```mermaid
 graph TD
-    subgraph Client Layer
-        UI_SPA[Vite React 19 SPA :8080]
-        UI_JINJA[Flask Jinja2 SaaS UI :5001]
+    subgraph ClientLayer["Client Layer"]
+        UI_SPA["Vite React 19 SPA (:8080)"]
+        UI_JINJA["Flask Jinja2 SaaS UI (:5001)"]
     end
 
-    subgraph API & Backend Gateway
-        FLASK[Flask REST API :5001]
-        EXPRESS[Express Node API :5000]
-        DB[(SQLite3 DB: dermai.db)]
+    subgraph BackendGateway["API & Backend Gateway"]
+        FLASK["Flask REST API (:5001)"]
+        EXPRESS["Express Node API (:5000)"]
+        DB[("SQLite3 DB: dermai.db")]
     end
 
-    subgraph Deep Learning & CV Pipeline
-        PREP[Image Preprocessing: 224x224 RGB Zero-Mean BGR]
-        MODEL[ResNet50 Classifier: models/melanoma_resnet50.h5]
-        CALIB[Temperature Scaling Calibration: T=0.5000]
-        XAI[Grad-CAM Heatmap Engine: conv5_block3_out]
+    subgraph Pipeline["Deep Learning & CV Pipeline"]
+        PREP["Image Preprocessing: 224x224 RGB Zero-Mean BGR"]
+        MODEL["ResNet50 Classifier: models/melanoma_resnet50.h5"]
+        CALIB["Temperature Scaling Calibration: T=0.5000"]
+        XAI["Grad-CAM Heatmap Engine: conv5_block3_out"]
     end
 
-    subgraph RAG & Generative AI Microservice
-        RAG[Local RAG Engine: skin_diseases.md Chunking]
-        NIM[NVIDIA NIM Endpoint: meta/llama-3.1-70b-instruct]
-        PDF[ReportLab Clinical PDF Engine]
+    subgraph Microservice["RAG & Generative AI Microservice"]
+        RAG["Local RAG Engine: skin_diseases.md Chunking"]
+        NIM["NVIDIA NIM Endpoint: meta/llama-3.1-70b-instruct"]
+        PDF["ReportLab Clinical PDF Engine"]
     end
 
     UI_SPA -->|HTTP / JSON| EXPRESS
