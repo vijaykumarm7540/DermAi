@@ -5,7 +5,6 @@
 [![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![Express](https://img.shields.io/badge/Express-4.21.2-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
 [![NVIDIA NIM](https://img.shields.io/badge/NVIDIA--NIM-Llama--3.1--70B-76B900?style=flat-square&logo=nvidia&logoColor=white)](https://build.nvidia.com/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 **DermAI** is an advanced, production-grade clinical decision-support and visual explainability platform engineered for early detection, confidence calibration, and automated risk stratification of **Melanoma** vs. **Benign** dermoscopic skin lesions.
 
@@ -237,11 +236,3 @@ npm run dev
 | `/doctor/<doctor_name>`| `GET` | Flask (Port 5001) | Queries reports filtered by attending doctor with full clinical metrics. |
 | `/patient/<patient_name>`| `GET` | Flask (Port 5001) | Queries simplified patient history records hiding technical model internals. |
 | `/api/insights/generate` | `POST` | Node (Port 5000) | Local RAG chunking + NVIDIA NIM (`meta/llama-3.1-70b-instruct`) report generation. |
-
----
-
-## 📄 License & Medical Disclaimer
-
-This project is licensed under the **MIT License**.
-
-> ⚠️ **Clinical Disclaimer**: **DermAI** is designed solely for educational, research, and preliminary screening reference. It is **not** a certified medical diagnostic device and does not replace professional consultation, biopsy, or diagnosis by a board-certified dermatologist.
