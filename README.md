@@ -236,3 +236,13 @@ npm run dev
 | `/doctor/<doctor_name>`| `GET` | Flask (Port 5001) | Queries reports filtered by attending doctor with full clinical metrics. |
 | `/patient/<patient_name>`| `GET` | Flask (Port 5001) | Queries simplified patient history records hiding technical model internals. |
 | `/api/insights/generate` | `POST` | Node (Port 5000) | Local RAG chunking + NVIDIA NIM (`meta/llama-3.1-70b-instruct`) report generation. |
+
+## Project Structure
+
+The project is organized into three main directories:
+
+- `frontend/` — Contains the client-side application.
+- `backend/` — Contains the server-side application and API logic.
+- `docs/` — Contains project documentation and supporting resources.
+
+This structure separates the user interface, server-side functionality, and documentation to make the project easier to navigate and maintain.
